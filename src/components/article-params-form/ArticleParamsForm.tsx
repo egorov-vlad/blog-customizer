@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import clsx from 'clsx';
 
+import { useOutsideClick } from './hooks/useOutsideClick';
 import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
 import { Select } from '../select';
@@ -32,10 +33,11 @@ export const ArticleParamsForm = ({
 }: ArticleParamsFormProps) => {
 	const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 	const [options, setOptions] = useState<ArticleStateType>(articleState);
-
-	const toggleArrowButtonClick = () => {
-		setIsFormOpen(!isFormOpen);
-	};
+	const formRef = useRef<HTMLDivElement>(null);
+	useOutsideClick({
+		ref: formRef,
+		onClick: () => setIsFormOpen(false),
+	});
 
 	const onChangeSelectedItem = (
 		key: keyof ArticleStateType,
@@ -49,14 +51,14 @@ export const ArticleParamsForm = ({
 		onArticlesSubmit(options);
 	};
 
-	const onReset = () => {
-		setOptions(defaultArticleState);
-		onArticlesSubmit(defaultArticleState);
-	};
-
 	return (
-		<>
-			<ArrowButton onClick={toggleArrowButtonClick} isFormOpen={isFormOpen} />
+		<div ref={formRef}>
+			<ArrowButton
+				onClick={() => {
+					setIsFormOpen(!isFormOpen);
+				}}
+				isFormOpen={isFormOpen}
+			/>
 			<aside
 				className={clsx(styles.container, {
 					[styles.container_open]: isFormOpen,
@@ -104,11 +106,18 @@ export const ArticleParamsForm = ({
 						onChange={(option) => onChangeSelectedItem('contentWidth', option)}
 					/>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' type='reset' onClick={onReset} />
+						<Button
+							title='Сбросить'
+							type='reset'
+							onClick={() => {
+								setOptions(defaultArticleState);
+								onArticlesSubmit(defaultArticleState);
+							}}
+						/>
 						<Button title='Применить' type='submit' />
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
