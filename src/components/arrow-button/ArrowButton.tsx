@@ -4,7 +4,7 @@ import styles from './ArrowButton.module.scss';
 import clsx from 'clsx';
 
 /** Функция для обработки открытия/закрытия формы */
-export type OnClick = () => void;
+export type OnClick = (isFormOpen: boolean) => void;
 
 export type ArrowButtonProps = {
 	onClick: OnClick;
@@ -18,7 +18,9 @@ export const ArrowButton = ({ onClick, isFormOpen }: ArrowButtonProps) => {
 			role='button'
 			aria-label='Открыть/Закрыть форму параметров статьи'
 			tabIndex={0}
-			onClick={onClick}
+			onClick={() => {
+				onClick(!isFormOpen);
+			}}
 			className={clsx(styles.container, {
 				[styles.container_open]: isFormOpen,
 			})}>
